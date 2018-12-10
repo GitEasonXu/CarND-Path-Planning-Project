@@ -1,8 +1,10 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
+
 <div  align="center">    
-<img src="result/bset.png" width=60% height=60% border=0/>
+<img src="result/best.png" width=70% height=70% border=0/>
 </div>
+
 ## Introduction     
 
 The goal of this project is to navigate a car around a simulated highway scenario, including traffic and given waypoint, telemetry, and sensor fusion data. The car must not violate a set of motion constraints, namely maximum velocity, maximum acceleration, and maximum jerk, while also avoiding collisions with other vehicles, keeping to within a highway lane (aside from short periods of time while changing lanes), and changing lanes when doing so is necessary to maintain a speed near the posted speed limit.
@@ -39,7 +41,7 @@ There are three situations: `ego_lane_id`(represents the road id of the current 
 
 <div  align="center">    
 <img src="result/left-middle.png" width=50% height=50% border=0/>
-<img src="result/middle-left.png" width=50% height=50% border=0/>
+<img src="result/middl-left.png" width=50% height=50% border=0/>
 </div>
 <div  align="center">    
 <img src="result/middle-right.png" width=50% height=50% border=0/>
