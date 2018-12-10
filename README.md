@@ -1,6 +1,85 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
+<div  align="center">    
+<img src="result/bset.png" width=60% height=60% border=0/>
+</div>
+## Introduction     
+
+The goal of this project is to navigate a car around a simulated highway scenario, including traffic and given waypoint, telemetry, and sensor fusion data. The car must not violate a set of motion constraints, namely maximum velocity, maximum acceleration, and maximum jerk, while also avoiding collisions with other vehicles, keeping to within a highway lane (aside from short periods of time while changing lanes), and changing lanes when doing so is necessary to maintain a speed near the posted speed limit.
+
+This implementation is summarized in the following five steps:
+
+- **Perception**:Using sensor fusion data perceive the surrounding environment and predict the target trajectory.
+- **Behavior planning**:Planning the next station of self driving car based on  perception input.
+- **Trajectories generation**:Generate smooth and safe tracks.
+
+#### Perception [line 294 to 308](./src/main.cpp#L294-L308)
+*Statement* : Left Lane ID: 1, Middle Lane ID: 2, Right Lane ID: 3.
+
+```
+            bool too_close = false;
+            bool car_left = false;
+            bool car_right = false;
+            static bool try_change_line = false;
+
+            static int left_car_num = 0;
+            static int right_car_num = 0;
+```
+Four bool variables and two int variables are defined here. This variables will be used in the Behavior planner step
+. `too_close` `car_left` `car_right` will be set `true` if the distance of head/left/right is closed 
+
+#### Behavior planning [line 310 to 426](./src/main.cpp#L310-L426)
+
+If `too_close` is `true` means that the vehicle is too close to the ahead vehicle, so the lane of vehicle should be changed.
+There are three situations: `ego_lane_id`(represents the road id of the current vehicle) are 1 2 or 3.
+
+- `ego_lane_id == 1`: can turn right only(from left lane to middle lane).
+- `ego_lane_id == 2`: can turn right or left(from middle to right or left). In order to make a best choice, we refer to the num of vehicles in the lanes on both sides. if `right_car_num` is small, vehicle turning right.
+- `ego_lane_id == 3`:can turn left only(from right lane to middle lane).
+
+<div  align="center">    
+<img src="result/left-middle.png" width=50% height=50% border=0/>
+<img src="result/middle-left.png" width=50% height=50% border=0/>
+</div>
+<div  align="center">    
+<img src="result/middle-right.png" width=50% height=50% border=0/>
+<img src="result/right-middle.png" width=50% height=50% border=0/>
+</div>
+
+#### Trajectories generation [line 428 to 520](./src/main.cpp#L428-L520)
+
+```
+            // create a spline
+            tk::spline s;
+            // set (x, y) points to the spline
+            s.set_points(ptsx, ptsy);
+```
+In order to make the trajectory smoother, using `ptsx` and `ptsy` get spline `s`function.
+```
+            double target_x = 30.0;
+            double target_y = s(target_x);
+            double target_dist = sqrt((target_x * target_x) + (target_y * target_y));
+            double x_add_on = 0;
+            for(int i = 1; i <= 50 - previous_path_x.size(); i++)
+            {
+              double N = (target_dist / (0.02 * ref_val/2.24));
+              double x_point = x_add_on + (target_x)/N;
+              double y_point = s(x_point);
+              x_add_on = x_point;
+              double x_ref = x_point;
+              double y_ref = y_point;
+              // rotate back to normal after rotating it  eariler
+              x_point = x_ref*cos(ref_yaw) - y_ref * sin(ref_yaw);
+              y_point = x_ref*sin(ref_yaw) + y_ref*cos(ref_yaw);
+              x_point += ref_x;
+              y_point += ref_y;
+              next_x_vals.push_back(x_point);
+              next_y_vals.push_back(y_point);
+}
+```
+Interpolate to get the remaining values of x and y.
+
+** the description below is Udacity's original README for the project repo. **
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
 
